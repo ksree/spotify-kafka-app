@@ -9,6 +9,8 @@ public class AppConfig {
     private final Integer queueCapacity;
     private final Integer producerFrequencyMs;
     private final String bootstrapServers;
+    private final String clientId;
+    private final String clientSecret;
 
 
     public AppConfig(Config config) {
@@ -17,6 +19,8 @@ public class AppConfig {
         this.topicName = config.getString("kafka.topic.name");
         this.queueCapacity = config.getInt("app.queue.capacity");
         this.producerFrequencyMs = config.getInt("app.producer.frequency.ms");
+        this.clientId = config.getString("app.spotify.clientId");
+        this.clientSecret = config.getString("app.spotify.clientSecret");
     }
 
     public String getBootstrapServers() {
@@ -37,5 +41,13 @@ public class AppConfig {
 
     public Integer getProducerFrequencyMs() {
         return producerFrequencyMs;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
     }
 }

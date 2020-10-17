@@ -16,10 +16,10 @@ import java.util.List;
 public class SpotifyAPIMethods {
 
     private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
-            .setAccessToken(ClientCredential.clientCredentials_Sync())
+            .setAccessToken(ClientCredential.getInstance().getCredentials())
             .build();
 
-    public static List<PlaylistSimplified> getListOfFeaturedPlaylists_Sync() {
+    public static List<PlaylistSimplified> getListOfFeaturedPlaylists() {
         try {
             final FeaturedPlaylists featuredPlaylists = spotifyApi
                     .getListOfFeaturedPlaylists().build().execute();
@@ -40,7 +40,7 @@ public class SpotifyAPIMethods {
         }
     }
     public static void main(String[] args) {
-        List<PlaylistSimplified> playlists  = getListOfFeaturedPlaylists_Sync();
+        List<PlaylistSimplified> playlists  = getListOfFeaturedPlaylists();
         for(PlaylistSimplified p: playlists){
             System.out.println(p.getName());
             PlaylistTracksInformation pl = p.getTracks();

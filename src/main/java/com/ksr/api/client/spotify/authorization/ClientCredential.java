@@ -1,58 +1,45 @@
 package com.ksr.api.client.spotify.authorization;
 
+import com.ksr.kafka.producer.spotify.AppConfig;
+import com.typesafe.config.ConfigFactory;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import org.apache.hc.core5.http.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 public class ClientCredential {
-    private static final String clientId = "";
-    private static final String clientSecret = "";
+    private Logger log = LoggerFactory.getLogger(ClientCredential.class.getSimpleName());
 
-    private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
-            .setClientId(clientId)
-            .setClientSecret(clientSecret)
-            .build();
-    private static final ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials()
-            .build();
+    private static final ClientCredential clientCredentials = new ClientCredential( );
+    private static  ClientCredentialsRequest clientCredentialsRequest;
 
-    public static String clientCredentials_Sync() {
+    private ClientCredential() {
+        AppConfig appConfig = new AppConfig(ConfigFactory.load());
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setClientId(appConfig.getClientId())
+                .setClientSecret(appConfig.getClientSecret())
+                .build();
+         clientCredentialsRequest =
+                spotifyApi.clientCredentials()
+                        .build();
+    }
+
+    public String getCredentials() {
         try {
             final com.wrapper.spotify.model_objects.credentials.ClientCredentials clientCredentials = clientCredentialsRequest.execute();
             return clientCredentials.getAccessToken();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
+            log.info("Error: " + e.getMessage());
             return "";
         }
     }
 
-    public static void clientCredentials_Async() {
-        try {
-            final CompletableFuture<com.wrapper.spotify.model_objects.credentials.ClientCredentials> clientCredentialsFuture = clientCredentialsRequest.executeAsync();
-
-            // Thread free to do other tasks...
-
-            // Example Only. Never block in production code.
-            final com.wrapper.spotify.model_objects.credentials.ClientCredentials clientCredentials = clientCredentialsFuture.join();
-
-            // Set access token for further "spotifyApi" object usage
-            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-
-            System.out.println("Expires in: " + clientCredentials.getExpiresIn());
-        } catch (CompletionException e) {
-            System.out.println("Error: " + e.getCause().getMessage());
-        } catch (CancellationException e) {
-            System.out.println("Async operation cancelled.");
-        }
+    public static ClientCredential getInstance() {
+        return clientCredentials;
     }
 
-    public static void main(String[] args) {
-        clientCredentials_Sync();
-        clientCredentials_Async();
-    }
 }

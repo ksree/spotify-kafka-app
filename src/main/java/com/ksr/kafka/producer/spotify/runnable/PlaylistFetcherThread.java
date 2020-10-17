@@ -33,7 +33,7 @@ public class PlaylistFetcherThread implements Runnable {
             while (keepOnRunning) {
                 List<PlaylistSimplified> playLists;
                 try {
-                    playLists = spotifyRestClient.getListOfFeaturedPlaylists_Sync();
+                    playLists = spotifyRestClient.getListOfFeaturedPlaylists();
                     log.info("Fetched " + playLists.size() + " play lists");
                     if (playLists.size() == 0) {
                         keepOnRunning = false;
