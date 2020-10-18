@@ -1,7 +1,8 @@
 package com.ksr.kafka.producer.spotify.runnable;
 
-import com.ksr.api.client.spotify.SpotifyAPIMethods;
+import com.ksr.api.client.spotify.SpotifyRESTClient;
 import com.ksr.kafka.producer.spotify.AppConfig;
+import com.ksr.kafka.producer.spotify.model.PlaylistApiResponse;
 import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ public class PlaylistFetcherThread implements Runnable {
     private final AppConfig appConfig;
     private final ArrayBlockingQueue<PlaylistSimplified> playlistQueue;
     private final CountDownLatch latch;
-    private SpotifyAPIMethods spotifyRestClient;
+    private SpotifyRESTClient spotifyRestClient;
 
     public PlaylistFetcherThread(AppConfig appConfig,
                                  ArrayBlockingQueue<PlaylistSimplified> playlistQueue,
@@ -31,18 +32,17 @@ public class PlaylistFetcherThread implements Runnable {
         try {
             Boolean keepOnRunning = true;
             while (keepOnRunning) {
-                List<PlaylistSimplified> playLists;
+                PlaylistApiResponse playlistApiResponse;
                 try {
-                    playLists = spotifyRestClient.getListOfFeaturedPlaylists();
-                    log.info("Fetched " + playLists.size() + " play lists");
-                    if (playLists.size() == 0) {
+                    playlistApiResponse = spotifyRestClient.getListOfFeaturedPlaylists();
+                    log.info("Fetched " + playlistApiResponse.getCount() + " play lists");
+                    if (playlistApiResponse.getCount() == 0) {
                         keepOnRunning = false;
                     } else {
                         // this may block if the queue is full - this is flow control
-                        log.info("Queue size :" + playlistQueue.size());
-                        for (PlaylistSimplified playList : playLists) {
-                            playlistQueue.put(playList);
-                        }
+                        log.info("Queue size :" + playlistApiResponse.getCount());
+                        for(PlaylistSimplified pl: playlistApiResponse.getPlaylists())
+                            playlistQueue.put(pl);
                     }
                 } finally {
                     Thread.sleep(50);

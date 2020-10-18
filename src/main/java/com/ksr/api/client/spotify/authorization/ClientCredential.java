@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class ClientCredential {
-    private Logger log = LoggerFactory.getLogger(ClientCredential.class.getSimpleName());
+    private final Logger log = LoggerFactory.getLogger(ClientCredential.class.getSimpleName());
 
     private static final ClientCredential clientCredentials = new ClientCredential( );
     private static  ClientCredentialsRequest clientCredentialsRequest;
