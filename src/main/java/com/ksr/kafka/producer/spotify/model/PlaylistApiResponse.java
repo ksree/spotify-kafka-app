@@ -21,7 +21,7 @@ public class PlaylistApiResponse {
         this.limit = limit;
         this.previous = previous;
         this.next = next;
-        this.playlists = playlists;
+        this.playListTrackMap = playListTrackMap;
     }
 
     public String getNext() {
@@ -64,13 +64,6 @@ public class PlaylistApiResponse {
         this.limit = limit;
     }
 
-    public List<PlaylistSimplified> getPlaylists() {
-        return playlists;
-    }
-
-    public void setPlaylists(List<PlaylistSimplified> playlists) {
-        this.playlists = playlists;
-    }
 
     public HashMap<String, List<PlaylistTrack>> getPlayListTrackMap() {
         return playListTrackMap;
@@ -78,5 +71,12 @@ public class PlaylistApiResponse {
 
     public void setPlayListTrackMap(HashMap<String, List<PlaylistTrack>> playListTrackMap) {
         this.playListTrackMap = playListTrackMap;
+    }
+    public List<PlaylistSimplified> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(List<PlaylistSimplified> playlists) {
+        this.playlists = playlists;
     }
 }

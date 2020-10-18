@@ -5,7 +5,9 @@ import com.ksr.kafka.producer.spotify.model.PlaylistApiResponse;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
-import com.wrapper.spotify.model_objects.specification.*;
+import com.wrapper.spotify.model_objects.specification.Paging;
+import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
+import com.wrapper.spotify.model_objects.specification.PlaylistTrack;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -33,8 +35,7 @@ public class SpotifyRESTClient {
             log.info("Message: " + featuredPlaylists.getMessage());
             Paging<PlaylistSimplified> pagingPL = featuredPlaylists.getPlaylists();
             List<PlaylistSimplified> playlists;
-            ArrayList<HashMap<String, Track>> playlistTracks = new ArrayList<>();
-            HashMap<String, List<PlaylistTrack>> playListTrackMap = new HashMap<String, List<PlaylistTrack>>();
+            HashMap<String, List<PlaylistTrack>> playListTrackMap = new HashMap<>();
             Integer count = pagingPL.getTotal();
             Integer offset = pagingPL.getOffset();
             String next = pagingPL.getNext();
@@ -48,18 +49,18 @@ public class SpotifyRESTClient {
                     log.error("No tracks found for : " + pl.getId());
                 }
             }
-            return new PlaylistApiResponse(count, offset, limit, previous, next, playlists, playlistTracks);
+            return new PlaylistApiResponse(count, offset, limit, previous, next, playlists, playListTrackMap);
 
         } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
             log.error("Error: " + e.getMessage());
-            return new PlaylistApiResponse(0, 0, 0, "", "", new ArrayList<>(), new ArrayList<>());
+            return new PlaylistApiResponse(0, 0, 0, "", "", new ArrayList<>(), new HashMap<>());
         }
     }
 
     public List<PlaylistTrack> getAlbumsTracks(String id) throws ParseException, SpotifyWebApiException, IOException {
         final GetPlaylistsItemsRequest trackRequest = spotifyApi.getPlaylistsItems(id).build();
         Paging<PlaylistTrack> track = trackRequest.execute();
-        log.info("Total number of tracks in album :" +id + " is track.getItems().length");
+        log.info("Total number of tracks in album :" + id + " is track.getItems().length");
         return Arrays.asList(track.getItems());
     }
 
