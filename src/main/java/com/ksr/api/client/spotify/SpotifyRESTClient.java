@@ -1,7 +1,7 @@
 package com.ksr.api.client.spotify;
 
 import com.ksr.api.client.spotify.authorization.ClientCredential;
-import com.ksr.kafka.producer.spotify.model.PlaylistApiResponse;
+import com.ksr.kafka.producer.spotify.model.FeaturedPlayList;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
@@ -28,7 +28,8 @@ public class SpotifyRESTClient {
             .build();
 
 
-    public PlaylistApiResponse getListOfFeaturedPlaylists() {
+    public List<FeaturedPlayList> getListOfFeaturedPlaylists() {
+        List<FeaturedPlayList> featuredPlayList = new ArrayList<FeaturedPlayList>();
         try {
             final FeaturedPlaylists featuredPlaylists = spotifyApi
                     .getListOfFeaturedPlaylists().build().execute();
@@ -44,17 +45,16 @@ public class SpotifyRESTClient {
             playlists = Arrays.asList(pagingPL.getItems());
             for (PlaylistSimplified pl : playlists) {
                 try {
-                    playListTrackMap.put(pl.getId(), getAlbumsTracks(pl.getId()));
+                    featuredPlayList.add(new FeaturedPlayList(pl.getName(), pl.getId(), getAlbumsTracks(pl.getId())));
                 } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
                     log.error("No tracks found for : " + pl.getId());
                 }
             }
-            return new PlaylistApiResponse(count, offset, limit, previous, next, playlists, playListTrackMap);
 
         } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
             log.error("Error: " + e.getMessage());
-            return new PlaylistApiResponse(0, 0, 0, "", "", new ArrayList<>(), new HashMap<>());
         }
+        return featuredPlayList;
     }
 
     public List<PlaylistTrack> getAlbumsTracks(String id) throws ParseException, SpotifyWebApiException, IOException {

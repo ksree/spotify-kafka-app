@@ -1,8 +1,10 @@
 package com.ksr.api.client.spotify;
 
-import com.ksr.kafka.producer.spotify.model.PlaylistApiResponse;
+import com.ksr.kafka.producer.spotify.model.FeaturedPlayList;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -17,9 +19,8 @@ public class SpotifyRESTClientTest {
 
     @Test
     public void getPlayListAPICallIsSuccessful() {
-        PlaylistApiResponse playlistsApiResponse = spotifyRESTClient.getListOfFeaturedPlaylists();
-        assertTrue(playlistsApiResponse.getPlayListTrackMap().size() > 0);
+        List<FeaturedPlayList> featuredPlayLists = spotifyRESTClient.getListOfFeaturedPlaylists();
+        assertTrue(featuredPlayLists.size() > 0);
     }
-
 }
 

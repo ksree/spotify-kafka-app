@@ -2,8 +2,7 @@ package com.ksr.kafka.producer.spotify.runnable;
 
 import com.ksr.api.client.spotify.SpotifyRESTClient;
 import com.ksr.kafka.producer.spotify.AppConfig;
-import com.ksr.kafka.producer.spotify.model.PlaylistApiResponse;
-import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
+import com.ksr.kafka.producer.spotify.model.FeaturedPlayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +14,12 @@ public class PlaylistFetcherThread implements Runnable {
     private Logger log = LoggerFactory.getLogger(PlaylistFetcherThread.class.getSimpleName());
 
     private final AppConfig appConfig;
-    private final ArrayBlockingQueue<PlaylistSimplified> playlistQueue;
+    private final ArrayBlockingQueue<FeaturedPlayList> playlistQueue;
     private final CountDownLatch latch;
     private SpotifyRESTClient spotifyRestClient;
 
     public PlaylistFetcherThread(AppConfig appConfig,
-                                 ArrayBlockingQueue<PlaylistSimplified> playlistQueue,
+                                 ArrayBlockingQueue<FeaturedPlayList> playlistQueue,
                                  CountDownLatch latch) {
         this.appConfig = appConfig;
         this.playlistQueue = playlistQueue;
@@ -32,16 +31,16 @@ public class PlaylistFetcherThread implements Runnable {
         try {
             Boolean keepOnRunning = true;
             while (keepOnRunning) {
-                PlaylistApiResponse playlistApiResponse;
+                List<FeaturedPlayList> featuredPlayLists;
                 try {
-                    playlistApiResponse = spotifyRestClient.getListOfFeaturedPlaylists();
-                    log.info("Fetched " + playlistApiResponse.getCount() + " play lists");
-                    if (playlistApiResponse.getCount() == 0) {
+                    featuredPlayLists = spotifyRestClient.getListOfFeaturedPlaylists();
+                    log.info("Fetched " + featuredPlayLists.size() + " play lists");
+                    if (featuredPlayLists.size() == 0) {
                         keepOnRunning = false;
                     } else {
                         // this may block if the queue is full - this is flow control
-                        log.info("Queue size :" + playlistApiResponse.getCount());
-                        for(PlaylistSimplified pl: playlistApiResponse.getPlaylists())
+                        log.info("Queue size :" + featuredPlayLists.size());
+                        for(FeaturedPlayList pl: featuredPlayLists)
                             playlistQueue.put(pl);
                     }
                 } finally {

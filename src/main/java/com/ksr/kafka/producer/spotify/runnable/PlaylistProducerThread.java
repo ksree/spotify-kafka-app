@@ -1,7 +1,7 @@
 package com.ksr.kafka.producer.spotify.runnable;
 
 import com.ksr.kafka.producer.spotify.AppConfig;
-import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
+import com.ksr.kafka.producer.spotify.model.FeaturedPlayList;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -19,13 +19,13 @@ public class PlaylistProducerThread implements Runnable {
     private Logger log = LoggerFactory.getLogger(PlaylistProducerThread.class.getSimpleName());
 
     private final AppConfig appConfig;
-    private final KafkaProducer<Long, PlaylistSimplified> kafkaProducer;
-    private final ArrayBlockingQueue<PlaylistSimplified> playlistQueue;
+    private final KafkaProducer<Long, FeaturedPlayList> kafkaProducer;
+    private final ArrayBlockingQueue<FeaturedPlayList> playlistQueue;
     private final CountDownLatch latch;
     private final String targetTopic;
 
     public PlaylistProducerThread(AppConfig appConfig,
-                                  ArrayBlockingQueue<PlaylistSimplified> playlistQueue,
+                                  ArrayBlockingQueue<FeaturedPlayList> playlistQueue,
                                   CountDownLatch latch) {
         this.appConfig = appConfig;
         this.playlistQueue = playlistQueue;
@@ -35,7 +35,7 @@ public class PlaylistProducerThread implements Runnable {
 
     }
 
-    public KafkaProducer<Long, PlaylistSimplified> createKafkaProducer(AppConfig appConfig) {
+    public KafkaProducer<Long, FeaturedPlayList> createKafkaProducer(AppConfig appConfig) {
         Properties properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, appConfig.getBootstrapServers());
         properties.put(ProducerConfig.ACKS_CONFIG, "all");
@@ -54,14 +54,14 @@ public class PlaylistProducerThread implements Runnable {
     public void run() {
         int playlistCount = 0;
         try {
-            while (latch.getCount() > 1 || playlistQueue.size() > 0){
-                PlaylistSimplified review = playlistQueue.poll();
-                if (review == null) {
+            while (latch.getCount() > 1 || playlistQueue.size() > 0) {
+                FeaturedPlayList playList = playlistQueue.poll();
+                if (playList == null) {
                     Thread.sleep(200);
                 } else {
                     playlistCount += 1;
-                    log.info("Sending review " + playlistCount + ": " + review);
-                    kafkaProducer.send(new ProducerRecord<>(targetTopic, review));
+                    log.info("Sending playList " + playlistCount + ": " + playList);
+                    kafkaProducer.send(new ProducerRecord<>(targetTopic, playList));
                     // sleeping to slow down the pace a bit
                     Thread.sleep(appConfig.getProducerFrequencyMs());
                 }

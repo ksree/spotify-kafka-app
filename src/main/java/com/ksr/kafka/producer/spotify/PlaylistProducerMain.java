@@ -1,5 +1,6 @@
 package com.ksr.kafka.producer.spotify;
 
+import com.ksr.kafka.producer.spotify.model.FeaturedPlayList;
 import com.ksr.kafka.producer.spotify.runnable.PlaylistFetcherThread;
 import com.ksr.kafka.producer.spotify.runnable.PlaylistProducerThread;
 import com.typesafe.config.ConfigFactory;
@@ -28,9 +29,9 @@ public class PlaylistProducerMain {
         AppConfig appConfig = new AppConfig(ConfigFactory.load());
         latch = new CountDownLatch(2);
         executor = Executors.newFixedThreadPool(2);
-        ArrayBlockingQueue<PlaylistSimplified> reviewsQueue = new ArrayBlockingQueue<>(appConfig.getQueueCapacity());
-        spotifyAPIClient = new PlaylistFetcherThread(appConfig, reviewsQueue, latch);
-        playListProducer = new PlaylistProducerThread(appConfig, reviewsQueue, latch);
+        ArrayBlockingQueue<FeaturedPlayList> playListQueue = new ArrayBlockingQueue<>(appConfig.getQueueCapacity());
+        spotifyAPIClient = new PlaylistFetcherThread(appConfig, playListQueue, latch);
+        playListProducer = new PlaylistProducerThread(appConfig, playListQueue, latch);
     }
 
     private void start() {
