@@ -11,12 +11,14 @@ public class AppConfig {
     private final String bootstrapServers;
     private final String clientId;
     private final String clientSecret;
+    public String kafkaConfigFile;
 
 
     public AppConfig(Config config) {
         this.bootstrapServers = config.getString("kafka.bootstrap.servers");
         this.schemaRegistryUrl = config.getString("kafka.schema.registry.url");
         this.topicName = config.getString("kafka.topic.name");
+        this.kafkaConfigFile = config.getString("kafka.configFile");
         this.queueCapacity = config.getInt("app.queue.capacity");
         this.producerFrequencyMs = config.getInt("app.producer.frequency.ms");
         this.clientId = config.getString("app.spotify.clientId");
@@ -50,4 +52,13 @@ public class AppConfig {
     public String getClientSecret() {
         return clientSecret;
     }
+
+    public String getKafkaConfigFile() {
+        return kafkaConfigFile;
+    }
+
+    public void setKafkaConfigFile(String kafkaConfigFile) {
+        this.kafkaConfigFile = kafkaConfigFile;
+    }
+
 }

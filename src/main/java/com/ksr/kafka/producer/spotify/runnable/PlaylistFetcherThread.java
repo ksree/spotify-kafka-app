@@ -16,7 +16,6 @@ public class PlaylistFetcherThread implements Runnable {
     private final AppConfig appConfig;
     private final ArrayBlockingQueue<FeaturedPlayList> playlistQueue;
     private final CountDownLatch latch;
-    private SpotifyRESTClient spotifyRestClient;
 
     public PlaylistFetcherThread(AppConfig appConfig,
                                  ArrayBlockingQueue<FeaturedPlayList> playlistQueue,
@@ -28,6 +27,7 @@ public class PlaylistFetcherThread implements Runnable {
 
     @Override
     public void run() {
+        SpotifyRESTClient spotifyRestClient = new SpotifyRESTClient();
         try {
             Boolean keepOnRunning = true;
             while (keepOnRunning) {
@@ -35,6 +35,8 @@ public class PlaylistFetcherThread implements Runnable {
                 try {
                     featuredPlayLists = spotifyRestClient.getListOfFeaturedPlaylists();
                     log.info("Fetched " + featuredPlayLists.size() + " play lists");
+                    System.out.println("Fetched " + featuredPlayLists.size() + " play lists");
+
                     if (featuredPlayLists.size() == 0) {
                         keepOnRunning = false;
                     } else {
@@ -44,7 +46,7 @@ public class PlaylistFetcherThread implements Runnable {
                             playlistQueue.put(pl);
                     }
                 } finally {
-                    Thread.sleep(50);
+                    Thread.sleep(600000 );
                 }
             }
         } catch (InterruptedException e) {

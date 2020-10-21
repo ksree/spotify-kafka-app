@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -19,12 +20,12 @@ public class PlaylistProducerMain {
     private PlaylistFetcherThread spotifyAPIClient;
     private PlaylistProducerThread playListProducer;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         PlaylistProducerMain app = new PlaylistProducerMain();
         app.start();
     }
 
-    private PlaylistProducerMain() {
+    private PlaylistProducerMain() throws IOException {
         AppConfig appConfig = new AppConfig(ConfigFactory.load());
         latch = new CountDownLatch(2);
         executor = Executors.newFixedThreadPool(2);
