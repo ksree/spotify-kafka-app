@@ -39,4 +39,6 @@ public class FeaturedPlayList {
     public void setPlaylistTracks(List<PlaylistTrack> playlistTracks) {
         this.playlistTracks = playlistTracks;
     }
+
 }
+

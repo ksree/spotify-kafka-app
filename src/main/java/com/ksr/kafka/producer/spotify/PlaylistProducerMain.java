@@ -4,7 +4,6 @@ import com.ksr.kafka.producer.spotify.model.FeaturedPlayList;
 import com.ksr.kafka.producer.spotify.runnable.PlaylistFetcherThread;
 import com.ksr.kafka.producer.spotify.runnable.PlaylistProducerThread;
 import com.typesafe.config.ConfigFactory;
-import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
